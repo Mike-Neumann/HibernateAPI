@@ -1,8 +1,5 @@
 package me.xra1ny.hibernateapi;
 
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import me.xra1ny.hibernateapi.annotations.DaoInfo;
 import me.xra1ny.hibernateapi.exceptions.NotAnnotatedException;
@@ -10,6 +7,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 public class BasicDao {
@@ -23,7 +23,7 @@ public class BasicDao {
         final DaoInfo info = getClass().getDeclaredAnnotation(DaoInfo.class);
 
         if(info == null) {
-            throw new RuntimeException(new NotAnnotatedException(getClass(), DaoInfo.class));
+            throw new NotAnnotatedException(getClass(), DaoInfo.class);
         }
 
         this.hibernateConfiguration = hibernateConfiguration;

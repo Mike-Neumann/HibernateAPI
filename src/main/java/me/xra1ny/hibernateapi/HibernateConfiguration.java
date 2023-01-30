@@ -1,6 +1,8 @@
 package me.xra1ny.hibernateapi;
 
 import lombok.Getter;
+import me.xra1ny.hibernateapi.annotations.HibernateConfigurationInfo;
+import me.xra1ny.hibernateapi.exceptions.NotAnnotatedException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class HibernateConfiguration {
+public class HibernateConfiguration {
     @Getter(onMethod = @__(@NotNull))
     private final Configuration configuration;
 
@@ -21,6 +23,17 @@ public final class HibernateConfiguration {
 
     @Getter(onMethod = @__(@NotNull))
     private final List<BasicDao> registeredDaos = new ArrayList<>();
+
+    public HibernateConfiguration() {
+        final HibernateConfigurationInfo info = getClass().getDeclaredAnnotation(HibernateConfigurationInfo.class);
+
+        if(info == null) {
+            throw new NotAnnotatedException(HibernateConfiguration.class, HibernateConfigurationInfo.class);
+        }
+
+        this.configuration = new Configuration().configure(info.hibernateCfgXmlUrl());
+        this.sessionFactory = configuration.buildSessionFactory();
+    }
 
     public HibernateConfiguration(@NotNull String hibernateCfgXmlUrl) {
         this.configuration = new Configuration().configure(hibernateCfgXmlUrl);
