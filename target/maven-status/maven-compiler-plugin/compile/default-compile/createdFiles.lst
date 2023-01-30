@@ -1,0 +1,9 @@
+me\xra1ny\hibernateapi\annotations\DaoInfo.class
+me\xra1ny\hibernateapi\annotations\HibernateConfigurationInfo.class
+me\xra1ny\hibernateapi\exceptions\NotAnnotatedException.class
+me\xra1ny\hibernateapi\BasicService.class
+me\xra1ny\hibernateapi\BasicDao.class
+me\xra1ny\hibernateapi\BasicEntity.class
+me\xra1ny\hibernateapi\HibernateConfiguration.class
+me\xra1ny\hibernateapi\annotations\ServiceInfo.class
+me\xra1ny\hibernateapi\exceptions\AlreadyRegisteredException.class

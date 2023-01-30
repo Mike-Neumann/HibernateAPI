@@ -68,7 +68,8 @@ public class HibernateConfiguration {
 
                 return service;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                throw new RuntimeException();
             }
         }else {
             return service;
@@ -85,12 +86,15 @@ public class HibernateConfiguration {
         if(dao == null) {
             try {
                 dao = daoClass.getDeclaredConstructor(HibernateConfiguration.class).newInstance(this);
+
                 registeredDaos.add((BasicDao) dao);
+
                 revalidateSessionFactory();
 
                 return dao;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                throw new RuntimeException();
             }
         }else {
             return dao;
