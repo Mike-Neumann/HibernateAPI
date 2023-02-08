@@ -7,6 +7,11 @@
       <option name="url" value="https://repo.cosidev.de/repository/maven-jboss-thirdparty-releases/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="maven-vmp-team-repo" />
+      <option name="name" value="vmp team repo group" />
+      <option name="url" value="https://repo.cosidev.de/repository/maven-vmp-team-repo" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
@@ -15,6 +20,11 @@
       <option name="id" value="maven-vms-team-repo" />
       <option name="name" value="vms team repo group" />
       <option name="url" value="https://repo.cosidev.de/repository/maven-vms-team-repo" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven-ej-technologies-repo" />
+      <option name="name" value="ej-technologies repo for install4j deps" />
+      <option name="url" value="https://repo.cosidev.de/repository/maven-ej-technologies-repo" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />

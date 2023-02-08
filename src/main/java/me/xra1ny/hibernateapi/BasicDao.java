@@ -1,5 +1,6 @@
 package me.xra1ny.hibernateapi;
 
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.xra1ny.hibernateapi.annotations.DaoInfo;
@@ -60,6 +61,40 @@ public class BasicDao {
             transaction.commit();
 
             return t;
+        }
+    }
+
+    @Nullable
+    public <T> T getObject(@NotNull Class<T> type, @NotNull Map<String, Object> columnValues) {
+        return getObjects(type, columnValues).stream().findFirst().orElse(null);
+    }
+
+    @NotNull
+    public <T> List<T> getObjects(@NotNull Class<T> type, @NotNull Map<String, Object> columnValues) {
+        try(Session session = hibernateConfiguration.getSessionFactory().openSession()) {
+            CriteriaQuery<T> query = session.getCriteriaBuilder().createQuery(type);
+            final Root<T> root = query.from(type);
+            for(Map.Entry<String, Object> entry : columnValues.entrySet()) {
+                query = query.select(root).where(session.getCriteriaBuilder().equal(root.get(entry.getKey()), entry.getValue()));
+            }
+
+            return session.createQuery(query).getResultList();
+        }
+    }
+
+    @Nullable
+    public <T> T getObject(@NotNull Class<T> type, @NotNull String column, @NotNull Object value) {
+        return getObjects(type, column, value).stream().findFirst().orElse(null);
+    }
+
+    @NotNull
+    public <T> List<T> getObjects(@NotNull Class<T> type, @NotNull String column, @NotNull Object value) {
+        try(Session session = hibernateConfiguration.getSessionFactory().openSession()) {
+            CriteriaQuery<T> query = session.getCriteriaBuilder().createQuery(type);
+            final Root<T> root = query.from(type);
+            query = query.select(root).where(session.getCriteriaBuilder().equal(root.get(column), value));
+
+            return session.createQuery(query).getResultList();
         }
     }
 
