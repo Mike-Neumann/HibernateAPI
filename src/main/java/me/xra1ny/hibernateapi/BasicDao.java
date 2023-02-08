@@ -1,21 +1,18 @@
 package me.xra1ny.hibernateapi;
 
+import java.util.List;
 import java.util.Map;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.xra1ny.hibernateapi.annotations.DaoInfo;
 import me.xra1ny.hibernateapi.exceptions.NotAnnotatedException;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 public class BasicDao {
@@ -104,7 +101,7 @@ public class BasicDao {
     @NotNull
     public <T> List<T> getAllObjects(@NotNull Class<T> type) {
         try(Session session = hibernateConfiguration.getSessionFactory().openSession()) {
-            final CriteriaQuery<T> criteriaQuery = (CriteriaQuery<T>) session.getCriteriaBuilder().createQuery();
+            final CriteriaQuery<T> criteriaQuery = session.getCriteriaBuilder().createQuery(type);
             final Root<T> rootEntry = criteriaQuery.from(type);
             final CriteriaQuery<T> all = criteriaQuery.select(rootEntry);
 
@@ -116,7 +113,7 @@ public class BasicDao {
     @NotNull
     public <T> List<T> getAllObjects(@NotNull Class<T> type, @NotNull Object... ids) {
         try(Session session = hibernateConfiguration.getSessionFactory().openSession()) {
-            final CriteriaQuery<T> criteriaQuery = (CriteriaQuery<T>) session.getCriteriaBuilder().createQuery();
+            final CriteriaQuery<T> criteriaQuery = session.getCriteriaBuilder().createQuery(type);
             final Root<T> rootEntry = criteriaQuery.from(type);
             final CriteriaQuery<T> all = criteriaQuery.select(rootEntry).where(rootEntry.in(ids));
 
