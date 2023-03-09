@@ -6,7 +6,7 @@ import me.xra1ny.hibernateapi.exceptions.NotAnnotatedException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +18,8 @@ public class HibernateConfiguration {
     @Getter(onMethod = @__(@NotNull))
     private SessionFactory sessionFactory;
 
-    @Getter(onMethod = @__(@NotNull))
+    @Getter(onMethod = @__({ @NotNull, @Unmodifiable}))
     private final List<BasicService> registeredServices = new ArrayList<>();
-
-    @Getter(onMethod = @__(@NotNull))
-    private final List<BasicDao> registeredDaos = new ArrayList<>();
 
     public HibernateConfiguration() {
         final HibernateConfigurationInfo info = getClass().getDeclaredAnnotation(HibernateConfigurationInfo.class);
@@ -32,27 +29,38 @@ public class HibernateConfiguration {
         }
 
         this.configuration = new Configuration().configure(info.hibernateCfgXmlUrl());
-        this.sessionFactory = configuration.buildSessionFactory();
+
+        buildSessionFactory(info.services());
     }
 
-    public HibernateConfiguration(@NotNull String hibernateCfgXmlUrl) {
+    @SafeVarargs
+    public HibernateConfiguration(@NotNull String hibernateCfgXmlUrl, @NotNull Class<? extends BasicService>... services) {
         this.configuration = new Configuration().configure(hibernateCfgXmlUrl);
-        this.sessionFactory = configuration.buildSessionFactory();
+
+        buildSessionFactory(services);
     }
 
     /**
-     * Revalidates the Session Factory of this Hibernate Configuration by reregistering all Entities on all Daos and rebuilding the Session Factory
+     * Builds the Session Factory of this HibernateConfiguration with the specified services
      */
-    public void revalidateSessionFactory() {
-        for(BasicDao dao : registeredDaos) {
-            for(Class<? extends BasicEntity> entityClass : dao.getEntities()) {
-                configuration.addAnnotatedClass(entityClass);
+    @SafeVarargs
+    private void buildSessionFactory(@NotNull Class<? extends BasicService>... services) {
+        for(Class<? extends BasicService> serviceClass : services) {
+            final BasicService service = getService(serviceClass);
+
+            for(BasicDao dao : service.getDaos()) {
+                for(Class<? extends BasicEntity> entity : dao.getEntities()) {
+                    this.configuration.addAnnotatedClass(entity);
+                }
             }
         }
 
-        sessionFactory = configuration.buildSessionFactory();
+        this.sessionFactory = this.configuration.buildSessionFactory();
     }
 
+    /**
+     * Retrieves the Service Instance specified by this Service Class. Registering it in the default HibernateConfiguration after Instance Creation
+     */
     @NotNull
     public <T> T getService(@NotNull Class<T> serviceClass) {
         T service = serviceClass.cast(registeredServices.stream()
@@ -66,6 +74,8 @@ public class HibernateConfiguration {
 
                 registeredServices.add((BasicService) service);
 
+                buildSessionFactory((Class<? extends BasicService>) serviceClass);
+
                 return service;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,31 +83,6 @@ public class HibernateConfiguration {
             }
         }else {
             return service;
-        }
-    }
-
-    @Nullable
-    public <T> T getDao(@NotNull Class<T> daoClass) {
-        T dao = daoClass.cast(registeredDaos.stream()
-                .filter(_dao -> _dao.getClass().equals(daoClass))
-                .findFirst()
-                .orElse(null));
-
-        if(dao == null) {
-            try {
-                dao = daoClass.getDeclaredConstructor(HibernateConfiguration.class).newInstance(this);
-
-                registeredDaos.add((BasicDao) dao);
-
-                revalidateSessionFactory();
-
-                return dao;
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
-        }else {
-            return dao;
         }
     }
 }

@@ -2,10 +2,10 @@ package me.xra1ny.hibernateapi;
 
 import me.xra1ny.hibernateapi.exceptions.NotAnnotatedException;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
-public class BasicEntity {
-    protected BasicEntity() {
+public abstract class BasicEntity {
+    public BasicEntity() {
         final Entity entity = getClass().getDeclaredAnnotation(Entity.class);
 
         if(entity == null) {
